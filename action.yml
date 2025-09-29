@@ -1,0 +1,36 @@
+name: "gbraad's Dotfiles `playbook` Action"
+description: 'Wrapper for playbook command for Ansible playbook execution on GitHub runners'
+author: "Gerard Braad <me@gbraad.nl>"
+inputs:
+  playbook:
+    description: 'The playbook path'
+    required: true
+    default: ''
+  command:
+    description: 'Command to execute (execute, remote, devenv, machine, etc. otherwise default)'
+    required: false
+    default: 'execute'
+  args:
+    description: 'Additional arguments to pass to the command'
+    required: false
+    default: ''
+  as_user:
+    description: 'User to run the commands as (optional)'
+    required: false
+    default: ""
+runs:
+  using: 'composite'
+  steps:
+    - name: Execute playbook command
+      uses: gbraad-actions/zsh-action@main
+      with:
+        as_user: ${{ inputs.as_user }}
+        run: |
+          # Check if playbook function exists
+          if ! type playbook >/dev/null 2>&1; then
+            echo "Error: playbook function is not defined. Please make sure to run install first"
+            exit 1
+          fi
+          
+          # Execute playbook command
+          playbook ${{ inputs.playbook }} ${{ inputs.command }} ${{ inputs.args }} 
